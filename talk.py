@@ -37,7 +37,8 @@ quiet_threshold = 150 # If the sound level is below this threshold, the recordin
                       # environment
 current_loop_iteration = 0
 
-
+# Handle running iterations of the conversation
+# Quit using ctrl-c 
 def main():
     loop = 0
     while ( loop < max_conversation_iterations):
@@ -51,7 +52,7 @@ def main():
         have_chatbot_speak(chatbot_response)
         loop += 1
     
-    
+# Record the microphone's sound.
 def record_audio():
     long_recording = []
     sound_level = 1000
@@ -65,7 +66,9 @@ def record_audio():
     while (sound_level > quiet_threshold and time_recorded < max_conversation_time_seconds):
         print("Listening . . .")
         # Record the audio
-        myrecording = sd.rec(int(recording_segment_length_seconds * audio_input_sample_rate), samplerate=audio_input_sample_rate, channels=1)
+        myrecording = sd.rec(int(recording_segment_length_seconds * audio_input_sample_rate), 
+                             samplerate=audio_input_sample_rate, 
+                             channels=1)
         
         sd.wait() # Wait for the conversation to end
         
@@ -83,12 +86,13 @@ def record_audio():
     return audio_file # test
 
 
-    
+# Transcribe the audo file into text using OpenAI Whisper API
 def transcribe_audio(audio_file):
     print("Transcribing audio . . .")
     transcript = openai.Audio.transcribe("whisper-1", audio_file)
     return transcript["text"]
     
+# Get chatbot response from OpenAI GPT-3.5-turbo API
 def get_chatbot_response():
     print("Asking openAI gpt-3.5-turbo for a response . . .")
     response = openai.ChatCompletion.create(
@@ -98,7 +102,8 @@ def get_chatbot_response():
     
     return response["choices"][0]["message"]["content"]
 
-
+# Takes the text and has the chatbot speak it through the computer speakers
+# uses eleven labs API 
 def have_chatbot_speak(text):
     print("Requesting chatbot voice . . .")
     request_body = {
