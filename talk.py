@@ -30,7 +30,7 @@ messages=[
 
 max_conversation_iterations = 10
 max_conversation_time_seconds = 15
-recording_segment_length_seconds = 1.25
+recoring_period = 1.25
 audio_input_sample_rate = 44100  
 quiet_threshold = 150 # If the sound level is below this threshold, the recording will stop
                       # use sum(abs(myrecording)) to get the sound level, and test the threshold for your
@@ -66,14 +66,14 @@ def record_audio():
     while (sound_level > quiet_threshold and time_recorded < max_conversation_time_seconds):
         print("Listening . . .")
         # Record the audio
-        myrecording = sd.rec(int(recording_segment_length_seconds * audio_input_sample_rate), 
+        myrecording = sd.rec(int(recoring_period * audio_input_sample_rate), 
                              samplerate=audio_input_sample_rate, 
                              channels=1)
         
         sd.wait() # Wait for the conversation to end
         
         # Check if they stopped talking
-        sound_level = sum(abs(myrecording))
+        sound_level = sum(abs(myrecording)) / recoring_period
 
         # Add the samples to one continuous sample
         long_recording.extend(myrecording)
